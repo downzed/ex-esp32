@@ -7,38 +7,48 @@
 #include "esp_log.h"
 
 #define BLINK_LED 5
-#define BLINK_LED_BUILTIN 2
 #define PUSH_BUTTON 23
+
+void init_components() {
+  gpio_set_direction(PUSH_BUTTON, GPIO_MODE_INPUT);
+
+  gpio_reset_pin(BLINK_LED);
+  gpio_set_direction(BLINK_LED, GPIO_MODE_OUTPUT);
+
+  gpio_set_level(BLINK_LED, 0);
+}
 
 void app_main(void) {
 
   char *ourTaskName = pcTaskGetName(NULL);
   ESP_LOGI(ourTaskName, "Hello, World!");
 
-  gpio_set_direction(PUSH_BUTTON, GPIO_MODE_INPUT);
+  init_components();
 
-  gpio_reset_pin(BLINK_LED);
-  gpio_set_direction(BLINK_LED, GPIO_MODE_OUTPUT);
-  /*gpio_set_direction(BLINK_LED_BUILTIN, GPIO_MODE_OUTPUT);*/
+  bool ledState = false;
+  bool buttonState = false;
+  bool lastButtonState = false;
 
-  gpio_set_level(BLINK_LED, 0);
-  /*gpio_set_level(BLINK_LED_BUILTIN, 0);*/
   while (1) {
-    if (gpio_get_level(PUSH_BUTTON) == 1) {
-      ESP_LOGI(ourTaskName, "Pressed!");
-      gpio_set_level(BLINK_LED, 1);
-      vTaskDelay(1000 / portTICK_PERIOD_MS);
-      /*gpio_set_level(BLINK_LED_BUILTIN, 0);*/
-      vTaskDelay(1000 / portTICK_PERIOD_MS);
-    } else {
-      gpio_set_level(BLINK_LED, 0);
-      /*gpio_set_level(BLINK_LED_BUILTIN, 1);*/
-    }
-    vTaskDelay(1);
+    buttonState = gpio_get_level(PUSH_BUTTON);
 
-    /*gpio_set_level(BLINK_LED, 1);*/
-    /*vTaskDelay(1000 / portTICK_PERIOD_MS);*/
-    /*gpio_set_level(BLINK_LED, 0);*/
-    /*vTaskDelay(1000 / portTICK_PERIOD_MS);*/
+    // Check if the button state has changed
+    if (buttonState != lastButtonState) {
+      // Debounce delay
+      vTaskDelay(50 / portTICK_PERIOD_MS);
+
+      // Check the button state again after the delay
+      if (buttonState == gpio_get_level(PUSH_BUTTON) && buttonState == 1) {
+        ledState = !ledState;
+        gpio_set_level(BLINK_LED, ledState);
+        ESP_LOGI(ourTaskName, "Button Pressed! LED state: %d", ledState);
+      }
+
+      // Update the last button state
+      lastButtonState = buttonState;
+    }
+
+    // Yield to other tasks
+    vTaskDelay(10 / portTICK_PERIOD_MS);
   }
 }

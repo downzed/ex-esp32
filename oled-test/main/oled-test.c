@@ -35,7 +35,7 @@ void app_main(void) {
   gpio_set_level(LED, 0);
   ssd1306_clear_screen(&dev, false);
   ssd1306_contrast(&dev, 0xff);
-  ssd1306_display_text_x3(&dev, 0, "Hello", 5, false);
+  ssd1306_display_text_x3(&dev, 1, "Hello", 5, false);
   vTaskDelay(3000 / portTICK_PERIOD_MS);
 
   while (1) {
@@ -47,14 +47,13 @@ void app_main(void) {
       gpio_set_level(LED, 1);
       vTaskDelay(1000 / portTICK_PERIOD_MS);
       ssd1306_contrast(&dev, 0xff);
-      ssd1306_display_text_x3(&dev, 0, "Marcus!", 7, false);
+      ssd1306_display_text(&dev, 0, "TOM!", 4, false);
       vTaskDelay(5000 / portTICK_PERIOD_MS);
       esp_restart();
     } else {
       vTaskDelay(1000 / portTICK_PERIOD_MS);
       gpio_set_level(LED, 0);
       vTaskDelay(1000 / portTICK_PERIOD_MS);
-      /*esp_restart();*/
     }
   }
 }
