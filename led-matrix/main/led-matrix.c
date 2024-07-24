@@ -38,5 +38,9 @@ void app_main(void) {
     vTaskDelay(500 / portTICK_PERIOD_MS);
     turn_off_led(ROW1_GPIO, COL1_GPIO);
     vTaskDelay(500 / portTICK_PERIOD_MS);
+    turn_on_led(ROW1_GPIO, COL2_GPIO);
+    vTaskDelay(500 / portTICK_PERIOD_MS);
+    turn_off_led(ROW1_GPIO, COL2_GPIO);
+    vTaskDelay(500 / portTICK_PERIOD_MS);
   }
 }
